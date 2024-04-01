@@ -48,9 +48,7 @@ static void adv_event_handler(mp_obj_t self_in, uint16_t event_id, ble_drv_adv_d
                 data->p_peer_addr[5], data->p_peer_addr[4], data->p_peer_addr[3],
                 data->p_peer_addr[2], data->p_peer_addr[1], data->p_peer_addr[0]);
 
-    item->addr = mp_obj_new_str(vstr.buf, vstr.len);
-
-    vstr_clear(&vstr);
+    item->addr = mp_obj_new_str_from_vstr(&vstr);
 
     item->addr_type = data->addr_type;
     item->rssi      = data->rssi;

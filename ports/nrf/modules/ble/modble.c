@@ -74,9 +74,7 @@ mp_obj_t ble_obj_address(void) {
                 local_addr.addr[5], local_addr.addr[4], local_addr.addr[3],
                 local_addr.addr[2], local_addr.addr[1], local_addr.addr[0]);
 
-    mp_obj_t mac_str = mp_obj_new_str(vstr.buf, vstr.len);
-
-    vstr_clear(&vstr);
+    mp_obj_t mac_str = mp_obj_new_str_from_vstr(&vstr);
 
     return mac_str;
 }
