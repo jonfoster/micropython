@@ -332,6 +332,22 @@ mp_obj_t mp_obj_new_int_from_ull(unsigned long long val) {
     }
 }
 
+mp_obj_t mp_obj_new_int_from_int32(int32_t val) {
+    if (sizeof(mp_int_t) > 4 || ((int32_t)MP_SMALL_INT_MIN <= val && val <= (int32_t)MP_SMALL_INT_MAX)) {
+        return MP_OBJ_NEW_SMALL_INT((mp_int_t)val);
+    } else {
+        return mp_obj_new_big_int_from_ll(val);
+    }
+}
+
+mp_obj_t mp_obj_new_int_from_uint32(uint32_t val) {
+    if (sizeof(mp_int_t) > 4 || (val <= (uint32_t)MP_SMALL_INT_MAX)) {
+        return MP_OBJ_NEW_SMALL_INT((mp_int_t)val);
+    } else {
+        return mp_obj_new_big_int_from_ll(val);
+    }
+}
+
 #if MICROPY_LONGINT_IMPL == MICROPY_LONGINT_IMPL_NONE
 
 int mp_obj_int_sign(mp_obj_t self_in) {

@@ -971,6 +971,8 @@ mp_obj_t mp_obj_new_cell(mp_obj_t obj);
 // (Or raise an overflow exception).
 mp_obj_t mp_obj_new_int(mp_int_t value);
 mp_obj_t mp_obj_new_int_from_uint(mp_uint_t value);
+mp_obj_t mp_obj_new_int_from_int32(int32_t val);
+mp_obj_t mp_obj_new_int_from_uint32(uint32_t val);
 mp_obj_t mp_obj_new_int_from_ll(long long val);
 mp_obj_t mp_obj_new_int_from_ull(unsigned long long val);
 
