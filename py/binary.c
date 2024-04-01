@@ -356,17 +356,9 @@ mp_obj_t mp_binary_get_val(char struct_type, char val_type, byte *p_base, byte *
         return mp_obj_new_float_from_d(fpu.f);
     #endif
     } else if (is_signed(val_type)) {
-        if ((long long)MP_SMALL_INT_MIN <= val && val <= (long long)MP_SMALL_INT_MAX) {
-            return mp_obj_new_int((mp_int_t)val);
-        } else {
-            return mp_obj_new_int_from_ll(val);
-        }
+        return mp_obj_new_int_from_ll(val);
     } else {
-        if ((unsigned long long)val <= (unsigned long long)MP_SMALL_INT_MAX) {
-            return mp_obj_new_int_from_uint((mp_uint_t)val);
-        } else {
-            return mp_obj_new_int_from_ull(val);
-        }
+        return mp_obj_new_int_from_ull(val);
     }
 }
 
