@@ -162,9 +162,19 @@ The following is an example of an ``mpconfigport.h`` file:
 
    // Type definitions for the specific machine.
 
-   typedef intptr_t mp_int_t; // must be pointer size
-   typedef uintptr_t mp_uint_t; // must be pointer size
-   typedef long mp_off_t;
+   // This include is optional.  It makes the following definitions
+   // much easier, if the platform has stdint.h.
+   #include <stdint.h>
+
+   typedef intptr_t mp_int_t; // must be intptr_t, or equivalent
+   typedef uintptr_t mp_uint_t; // must be uintptr_t, or equivalent
+
+   // Signed type for file offsets.  Can be int32_t usually,
+   // but if you want to be able to handle files sized at
+   // 2GiB or larger then this needs to be int64_t.
+   typedef int32_t mp_off_t;
+
+   #define MP_SSIZE_MAX INTPTR_MAX // must be INTPTR_MAX, or equivalent
 
    // We need to provide a declaration/definition of alloca().
    #include <alloca.h>
