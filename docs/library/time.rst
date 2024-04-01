@@ -95,7 +95,11 @@ Functions
     The wrap-around value is not explicitly exposed, but we will
     refer to it as *TICKS_MAX* to simplify discussion. Period of the values is
     *TICKS_PERIOD = TICKS_MAX + 1*. *TICKS_PERIOD* is guaranteed to be a power of
-    two, but otherwise may differ from port to port. The same period value is used
+    two, but otherwise may differ from port to port.  Typical values for
+    *TICKS_PERIOD* are `2^29`, `2^30`, `2^47`, `2^60` or `2^61`.  For every
+    currently-existing MicroPython port, *TICKS_PERIOD* is at least `2^29`,
+    which is about 6.2 days for `ticks_ms()`, although future ports may use
+    a lower value.  The same period value is used
     for all of `ticks_ms()`, `ticks_us()`, `ticks_cpu()` functions (for
     simplicity). Thus, these functions will return a value in range [*0* ..
     *TICKS_MAX*], inclusive, total *TICKS_PERIOD* values. Note that only
@@ -112,6 +116,10 @@ Functions
 .. function:: ticks_us()
 
    Just like `ticks_ms()` above, but in microseconds.
+
+   For every currently-existing MicroPython port, *TICKS_PERIOD* is at least
+   `2^29`, which is about 8 minutes for `ticks_us()`, although future ports
+   may use a lower value.
 
 .. function:: ticks_cpu()
 
