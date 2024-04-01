@@ -349,7 +349,7 @@ mp_obj_t mp_obj_int_pow3(mp_obj_t base, mp_obj_t exponent,  mp_obj_t modulus) {
     if (!mp_obj_is_int(base) || !mp_obj_is_int(exponent) || !mp_obj_is_int(modulus)) {
         mp_raise_TypeError(MP_ERROR_TEXT("pow() with 3 arguments requires integers"));
     } else {
-        mp_obj_t result = mp_obj_new_int_from_ull(0); // Use the _from_ull version as this forces an mpz int
+        mp_obj_t result = mp_obj_new_big_int_from_ull(0); // forces an mpz int
         mp_obj_int_t *res_p = (mp_obj_int_t *)MP_OBJ_TO_PTR(result);
 
         mpz_t l_temp, r_temp, m_temp;
@@ -380,13 +380,13 @@ mp_obj_t mp_obj_new_int(mp_int_t value) {
     return mp_obj_new_int_from_ll(value);
 }
 
-mp_obj_t mp_obj_new_int_from_ll(long long val) {
+mp_obj_t mp_obj_new_big_int_from_ll(long long val) {
     mp_obj_int_t *o = mp_obj_int_new_mpz();
     mpz_set_from_ll(&o->mpz, val, true);
     return MP_OBJ_FROM_PTR(o);
 }
 
-mp_obj_t mp_obj_new_int_from_ull(unsigned long long val) {
+mp_obj_t mp_obj_new_big_int_from_ull(unsigned long long val) {
     mp_obj_int_t *o = mp_obj_int_new_mpz();
     mpz_set_from_ll(&o->mpz, val, false);
     return MP_OBJ_FROM_PTR(o);
@@ -401,7 +401,7 @@ mp_obj_t mp_obj_new_int_from_uint(mp_uint_t value) {
     return mp_obj_new_int_from_ull(value);
 }
 
-mp_obj_t mp_obj_new_int_from_str_len(const char **str, size_t len, bool neg, unsigned int base) {
+mp_obj_t mp_obj_new_big_int_from_str_len(const char **str, size_t len, bool neg, unsigned int base) {
     mp_obj_int_t *o = mp_obj_int_new_mpz();
     size_t n = mpz_set_from_str(&o->mpz, *str, len, neg, base);
     *str += n;

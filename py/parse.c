@@ -385,7 +385,7 @@ static mp_obj_t mp_parse_node_convert_to_obj(mp_parse_node_t pn) {
         mp_uint_t sign_mask = -((mp_uint_t)1 << (mp_dynamic_compiler.small_int_bits - 1));
         if (!((arg & sign_mask) == 0 || (arg & sign_mask) == sign_mask)) {
             // Integer doesn't fit in a small-int, so create a multi-precision int object.
-            return mp_obj_new_int_from_ll(arg);
+            return mp_obj_new_big_int_from_ll(arg);
         }
         #endif
         return MP_OBJ_NEW_SMALL_INT(arg);

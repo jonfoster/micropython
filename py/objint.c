@@ -157,7 +157,7 @@ mp_obj_t mp_obj_new_int_from_float(mp_float_t val) {
         #else
         #if MICROPY_LONGINT_IMPL == MICROPY_LONGINT_IMPL_LONGLONG
         } else if (icl == MP_FP_CLASS_FIT_LONGINT) {
-            return mp_obj_new_int_from_ll((long long)val);
+            return mp_obj_new_big_int_from_ll((long long)val);
         #endif
         } else {
             mp_raise_ValueError(MP_ERROR_TEXT("float too big"));
@@ -300,6 +300,22 @@ char *mp_obj_int_formatted(char **buf, size_t *buf_size, size_t *fmt_size, mp_co
     return b;
 }
 
+mp_obj_t mp_obj_new_int_from_ll(long long val) {
+    if ((long long)MP_SMALL_INT_MIN <= val && val <= (long long)MP_SMALL_INT_MAX) {
+        return MP_OBJ_NEW_SMALL_INT((mp_int_t)val);
+    } else {
+        return mp_obj_new_big_int_from_ll(val);
+    }
+}
+
+mp_obj_t mp_obj_new_int_from_ull(unsigned long long val) {
+    if (val <= (unsigned long long)MP_SMALL_INT_MAX) {
+        return MP_OBJ_NEW_SMALL_INT((mp_int_t)val);
+    } else {
+        return mp_obj_new_big_int_from_ull(val);
+    }
+}
+
 #if MICROPY_LONGINT_IMPL == MICROPY_LONGINT_IMPL_NONE
 
 int mp_obj_int_sign(mp_obj_t self_in) {
@@ -324,19 +340,19 @@ mp_obj_t mp_obj_int_binary_op(mp_binary_op_t op, mp_obj_t lhs_in, mp_obj_t rhs_i
 }
 
 // This is called only with strings whose value doesn't fit in SMALL_INT
-mp_obj_t mp_obj_new_int_from_str_len(const char **str, size_t len, bool neg, unsigned int base) {
+mp_obj_t mp_obj_new_big_int_from_str_len(const char **str, size_t len, bool neg, unsigned int base) {
     mp_raise_msg(&mp_type_OverflowError, MP_ERROR_TEXT("long int not supported in this build"));
     return mp_const_none;
 }
 
 // This is called when an integer larger than a SMALL_INT is needed (although val might still fit in a SMALL_INT)
-mp_obj_t mp_obj_new_int_from_ll(long long val) {
+mp_obj_t mp_obj_new_big_int_from_ll(long long val) {
     mp_raise_msg(&mp_type_OverflowError, MP_ERROR_TEXT("small int overflow"));
     return mp_const_none;
 }
 
 // This is called when an integer larger than a SMALL_INT is needed (although val might still fit in a SMALL_INT)
-mp_obj_t mp_obj_new_int_from_ull(unsigned long long val) {
+mp_obj_t mp_obj_new_big_int_from_ull(unsigned long long val) {
     mp_raise_msg(&mp_type_OverflowError, MP_ERROR_TEXT("small int overflow"));
     return mp_const_none;
 }

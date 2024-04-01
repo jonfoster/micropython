@@ -106,18 +106,31 @@ mp_obj_t mp_obj_int_unary_op(mp_unary_op_t op, mp_obj_t o_in) {
         case MP_UNARY_OP_POSITIVE:
             return o_in;
         case MP_UNARY_OP_NEGATIVE:
+            // Note that on a system with 31-bit small ints,
+            // 0x40000000 is a big integer but -0x40000000
+            // is a small int.  So we return a small int in
+            // that case.
             return mp_obj_new_int_from_ll(-o->val);
         case MP_UNARY_OP_INVERT:
+            // Note that if there are lots of high bits set,
+            // inverting them may give a number that can be
+            // represented as a small integer.
             return mp_obj_new_int_from_ll(~o->val);
         case MP_UNARY_OP_ABS: {
             mp_obj_int_t *self = MP_OBJ_TO_PTR(o_in);
             if (self->val >= 0) {
                 return o_in;
             }
-            self = mp_obj_new_int_from_ll(self->val);
+            // Note that this will always be a big integer.
+            // While negating a certain positive number may
+            // give a small int, we're not negating positive
+            // numbers here.  Negating a negative number that
+            // is out-of-range for a small integer, will always
+            // give a positive number that is out-of-range for
+            // a small integer
+
             // TODO could overflow long long
-            self->val = -self->val;
-            return MP_OBJ_FROM_PTR(self);
+            return mp_obj_new_big_int_from_ll(-self->val);
         }
         case MP_UNARY_OP_INT_MAYBE:
             return o_in;
@@ -244,14 +257,14 @@ mp_obj_t mp_obj_new_int_from_uint(mp_uint_t value) {
     return mp_obj_new_int_from_ll(value);
 }
 
-mp_obj_t mp_obj_new_int_from_ll(long long val) {
+mp_obj_t mp_obj_new_big_int_from_ll(long long val) {
     mp_obj_int_t *o = mp_obj_malloc(mp_obj_int_t, &mp_type_int);
     o->val = val;
     return o;
 }
 
-mp_obj_t mp_obj_new_int_from_ull(unsigned long long val) {
-    // TODO raise an exception if the unsigned long long won't fit
+mp_obj_t mp_obj_new_big_int_from_ull(unsigned long long val) {
+    // Raise an exception if the unsigned long long won't fit
     if (val >> (sizeof(unsigned long long) * 8 - 1) != 0) {
         mp_raise_msg(&mp_type_OverflowError, MP_ERROR_TEXT("ulonglong too large"));
     }
@@ -260,7 +273,7 @@ mp_obj_t mp_obj_new_int_from_ull(unsigned long long val) {
     return o;
 }
 
-mp_obj_t mp_obj_new_int_from_str_len(const char **str, size_t len, bool neg, unsigned int base) {
+mp_obj_t mp_obj_new_big_int_from_str_len(const char **str, size_t len, bool neg, unsigned int base) {
     // TODO this does not honor the given length of the string, but it all cases it should anyway be null terminated
     // TODO check overflow
     mp_obj_int_t *o = mp_obj_malloc(mp_obj_int_t, &mp_type_int);

@@ -971,11 +971,13 @@ mp_obj_t mp_obj_new_cell(mp_obj_t obj);
 // (Or raise an overflow exception).
 mp_obj_t mp_obj_new_int(mp_int_t value);
 mp_obj_t mp_obj_new_int_from_uint(mp_uint_t value);
-
-// Functions that return big int only (or raise an overflow exception)
-mp_obj_t mp_obj_new_int_from_str_len(const char **str, size_t len, bool neg, unsigned int base);
 mp_obj_t mp_obj_new_int_from_ll(long long val);
 mp_obj_t mp_obj_new_int_from_ull(unsigned long long val);
+
+// Functions that return big int only (or raise an overflow exception)
+mp_obj_t mp_obj_new_big_int_from_str_len(const char **str, size_t len, bool neg, unsigned int base);
+mp_obj_t mp_obj_new_big_int_from_ll(long long val);
+mp_obj_t mp_obj_new_big_int_from_ull(unsigned long long val);
 
 mp_obj_t mp_obj_new_str(const char *data, size_t len); // will check utf-8 (raises UnicodeError)
 mp_obj_t mp_obj_new_str_0(const char *data); // will check utf-8 (raises UnicodeError)
