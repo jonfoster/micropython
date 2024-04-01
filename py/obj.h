@@ -965,11 +965,18 @@ static inline mp_obj_t mp_obj_new_bool(mp_int_t x) {
     return x ? mp_const_true : mp_const_false;
 }
 mp_obj_t mp_obj_new_cell(mp_obj_t obj);
+
+// Functions that return either small int or big int, depending
+// on the value passed.
+// (Or raise an overflow exception).
 mp_obj_t mp_obj_new_int(mp_int_t value);
 mp_obj_t mp_obj_new_int_from_uint(mp_uint_t value);
+
+// Functions that return big int only (or raise an overflow exception)
 mp_obj_t mp_obj_new_int_from_str_len(const char **str, size_t len, bool neg, unsigned int base);
-mp_obj_t mp_obj_new_int_from_ll(long long val); // this must return a multi-precision integer object (or raise an overflow exception)
-mp_obj_t mp_obj_new_int_from_ull(unsigned long long val); // this must return a multi-precision integer object (or raise an overflow exception)
+mp_obj_t mp_obj_new_int_from_ll(long long val);
+mp_obj_t mp_obj_new_int_from_ull(unsigned long long val);
+
 mp_obj_t mp_obj_new_str(const char *data, size_t len); // will check utf-8 (raises UnicodeError)
 mp_obj_t mp_obj_new_str_0(const char *data); // will check utf-8 (raises UnicodeError)
 mp_obj_t mp_obj_new_str_via_qstr(const char *data, size_t len); // input data must be valid utf-8
@@ -1033,6 +1040,7 @@ static inline bool mp_obj_is_integer(mp_const_obj_t o) {
 mp_int_t mp_obj_get_int(mp_const_obj_t arg);
 mp_int_t mp_obj_get_int_truncated(mp_const_obj_t arg);
 bool mp_obj_get_int_maybe(mp_const_obj_t arg, mp_int_t *value);
+
 #if MICROPY_PY_BUILTINS_FLOAT
 mp_float_t mp_obj_get_float(mp_obj_t self_in);
 bool mp_obj_get_float_maybe(mp_obj_t arg, mp_float_t *value);
@@ -1065,11 +1073,17 @@ static inline void mp_obj_cell_set(mp_obj_t self_in, mp_obj_t obj) {
 }
 
 // int
-// For long int, returns value truncated to mp_int_t
+// Caller must ensure self_in is an integer.  Big or small integers are both fine.
+// For long int, returns value truncated to mp_int_t.
+// Consider calling mp_obj_get_int_truncated() instead, which will check the type and call this.
 mp_int_t mp_obj_int_get_truncated(mp_const_obj_t self_in);
-// Will raise exception if value doesn't fit into mp_int_t
+// Caller must ensure self_in is an integer.  Big or small integers are both fine.
+// Will raise exception if value doesn't fit into mp_int_t.
+// Consider calling mp_obj_get_int() instead, which will check the type and call this.
 mp_int_t mp_obj_int_get_checked(mp_const_obj_t self_in);
-// Will raise exception if value is negative or doesn't fit into mp_uint_t
+// Caller must ensure self_in is an integer.  Big or small integers are both fine.
+// Will raise exception if value is negative or doesn't fit into mp_uint_t.
+// Consider calling mp_obj_get_uint() instead, which will check the type and call this.
 mp_uint_t mp_obj_int_get_uint_checked(mp_const_obj_t self_in);
 
 // exception
