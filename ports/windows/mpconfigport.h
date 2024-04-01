@@ -197,8 +197,8 @@ typedef uintptr_t mp_uint_t; // must be uintptr_t, or equivalent on platforms th
 
 typedef long suseconds_t;
 
-// Just assume Windows is little-endian - mingw32 gcc doesn't
-// define standard endianness macros.
+// Windows is always little-endian.
+// mingw32 gcc doesn't define standard endianness macros.
 #define MP_ENDIANNESS_LITTLE (1)
 
 // Cannot include <sys/types.h>, as it may lead to symbol name clashes
