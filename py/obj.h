@@ -1042,6 +1042,9 @@ static inline bool mp_obj_is_integer(mp_const_obj_t o) {
 }
 
 mp_int_t mp_obj_get_int(mp_const_obj_t arg);
+mp_uint_t mp_obj_get_uint(mp_const_obj_t arg);
+long long mp_obj_get_int_ll(mp_const_obj_t arg);
+unsigned long long mp_obj_get_int_ull(mp_const_obj_t arg);
 mp_int_t mp_obj_get_int_truncated(mp_const_obj_t arg);
 bool mp_obj_get_int_maybe(mp_const_obj_t arg, mp_int_t *value);
 
@@ -1089,6 +1092,14 @@ mp_int_t mp_obj_int_get_checked(mp_const_obj_t self_in);
 // Will raise exception if value is negative or doesn't fit into mp_uint_t.
 // Consider calling mp_obj_get_uint() instead, which will check the type and call this.
 mp_uint_t mp_obj_int_get_uint_checked(mp_const_obj_t self_in);
+// Caller must ensure self_in is an integer.  Big or small integers are both fine.
+// Will raise exception if value doesn't fit into long long.
+// Consider calling mp_obj_get_int_ll() instead, which will check the type and call this.
+long long mp_obj_int_get_ll_checked(mp_const_obj_t self_in);
+// Caller must ensure self_in is an integer.  Big or small integers are both fine.
+// Will raise exception if value is negative or doesn't fit into unsigned long long.
+// Consider calling mp_obj_get_int_ull() instead, which will check the type and call this.
+unsigned long long mp_obj_int_get_ull_checked(mp_const_obj_t self_in);
 
 // exception
 bool mp_obj_is_native_exception_instance(mp_obj_t self_in);

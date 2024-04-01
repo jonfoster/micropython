@@ -277,8 +277,49 @@ mp_int_t mp_obj_int_get_truncated(mp_const_obj_t self_in) {
 }
 
 mp_int_t mp_obj_int_get_checked(mp_const_obj_t self_in) {
-    // TODO: Check overflow
-    return mp_obj_int_get_truncated(self_in);
+    if (mp_obj_is_small_int(self_in)) {
+        return MP_OBJ_SMALL_INT_VALUE(self_in);
+    } else {
+        const mp_obj_int_t *self = self_in;
+        if (self->val >= (long long)INTPTR_MIN && self->val <= (long long)INTPTR_MAX) {
+            return self->val;
+        } else {
+            mp_raise_msg(&mp_type_OverflowError, MP_ERROR_TEXT("overflow converting long int to machine word"));
+        }
+    }
+}
+
+mp_uint_t mp_obj_int_get_uint_checked(mp_const_obj_t self_in) {
+    if (mp_obj_is_small_int(self_in)) {
+        if (MP_OBJ_SMALL_INT_VALUE(self_in) >= 0) {
+            return MP_OBJ_SMALL_INT_VALUE(self_in);
+        }
+    } else {
+        const mp_obj_int_t *self = self_in;
+        if (self->val >= 0 && (unsigned long long)self->val <= (unsigned long long)UINTPTR_MAX) {
+            return self->val;
+        }
+    }
+
+    mp_raise_msg(&mp_type_OverflowError, MP_ERROR_TEXT("overflow converting long int to machine word"));
+}
+
+long long mp_obj_int_get_ll_checked(mp_const_obj_t self_in) {
+    if (mp_obj_is_small_int(self_in)) {
+        return MP_OBJ_SMALL_INT_VALUE(self_in);
+    } else {
+        const mp_obj_int_t *self = self_in;
+        return self->val;
+    }
+}
+
+unsigned long long mp_obj_int_get_ull_checked(mp_const_obj_t self_in) {
+    long long val = mp_obj_int_get_ll_checked(self_in);
+    if (val >= 0) {
+        return val;
+    }
+
+    mp_raise_msg(&mp_type_OverflowError, MP_ERROR_TEXT("overflow converting long int to 64-bit"));
 }
 
 #if MICROPY_PY_BUILTINS_FLOAT

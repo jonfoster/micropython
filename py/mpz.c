@@ -1553,7 +1553,27 @@ bool mpz_as_int_checked(const mpz_t *i, mp_int_t *value) {
     mpz_dig_t *d = i->dig + i->len;
 
     while (d-- > i->dig) {
-        if (val > (~(MP_OBJ_WORD_MSBIT_HIGH) >> DIG_SIZE)) {
+        if (val > (INTPTR_MAX >> DIG_SIZE)) {
+            // will overflow
+            return false;
+        }
+        val = (val << DIG_SIZE) | *d;
+    }
+
+    if (i->neg != 0) {
+        val = -val;
+    }
+
+    *value = val;
+    return true;
+}
+
+bool mpz_as_ll_checked(const mpz_t *i, long long *value) {
+    long long val = 0;
+    mpz_dig_t *d = i->dig + i->len;
+
+    while (d-- > i->dig) {
+        if (val > (INT64_MAX >> DIG_SIZE)) {
             // will overflow
             return false;
         }
@@ -1578,7 +1598,28 @@ bool mpz_as_uint_checked(const mpz_t *i, mp_uint_t *value) {
     mpz_dig_t *d = i->dig + i->len;
 
     while (d-- > i->dig) {
-        if (val > (~(MP_OBJ_WORD_MSBIT_HIGH) >> (DIG_SIZE - 1))) {
+        if (val > (UINTPTR_MAX >> DIG_SIZE)) {
+            // will overflow
+            return false;
+        }
+        val = (val << DIG_SIZE) | *d;
+    }
+
+    *value = val;
+    return true;
+}
+
+bool mpz_as_ull_checked(const mpz_t *i, unsigned long long *value) {
+    if (i->neg != 0) {
+        // can't represent signed values
+        return false;
+    }
+
+    unsigned long long val = 0;
+    mpz_dig_t *d = i->dig + i->len;
+
+    while (d-- > i->dig) {
+        if (val > (UINT64_MAX >> DIG_SIZE)) {
             // will overflow
             return false;
         }

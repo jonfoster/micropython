@@ -433,6 +433,45 @@ mp_uint_t mp_obj_int_get_uint_checked(mp_const_obj_t self_in) {
     mp_raise_msg(&mp_type_OverflowError, MP_ERROR_TEXT("overflow converting long int to machine word"));
 }
 
+long long mp_obj_int_get_ll_checked(mp_const_obj_t self_in) {
+    if (sizeof(mp_int_t) == sizeof(long long)) {
+        return mp_obj_int_get_checked(self_in);
+    } else {
+        if (mp_obj_is_small_int(self_in)) {
+            return MP_OBJ_SMALL_INT_VALUE(self_in);
+        } else {
+            const mp_obj_int_t *self = MP_OBJ_TO_PTR(self_in);
+            long long value;
+            if (mpz_as_ll_checked(&self->mpz, &value)) {
+                return value;
+            } else {
+                // overflow
+                mp_raise_msg(&mp_type_OverflowError, MP_ERROR_TEXT("overflow converting long int to 64-bit"));
+            }
+        }
+    }
+}
+
+unsigned long long mp_obj_int_get_ull_checked(mp_const_obj_t self_in) {
+    if (sizeof(mp_uint_t) == sizeof(unsigned long long)) {
+        return mp_obj_int_get_uint_checked(self_in);
+    } else {
+        if (mp_obj_is_small_int(self_in)) {
+            if (MP_OBJ_SMALL_INT_VALUE(self_in) >= 0) {
+                return MP_OBJ_SMALL_INT_VALUE(self_in);
+            }
+        } else {
+            const mp_obj_int_t *self = MP_OBJ_TO_PTR(self_in);
+            unsigned long long value;
+            if (mpz_as_ull_checked(&self->mpz, &value)) {
+                return value;
+            }
+        }
+
+        mp_raise_msg(&mp_type_OverflowError, MP_ERROR_TEXT("overflow converting long int to 64-bit"));
+    }
+}
+
 #if MICROPY_PY_BUILTINS_FLOAT
 mp_float_t mp_obj_int_as_float_impl(mp_obj_t self_in) {
     assert(mp_obj_is_exact_type(self_in, &mp_type_int));

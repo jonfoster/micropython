@@ -303,47 +303,85 @@ bool mp_obj_equal(mp_obj_t o1, mp_obj_t o2) {
     return mp_obj_is_true(mp_obj_equal_not_equal(MP_BINARY_OP_EQUAL, o1, o2));
 }
 
-mp_int_t mp_obj_get_int(mp_const_obj_t arg) {
-    // This function essentially performs implicit type conversion to int
-    // Note that Python does NOT provide implicit type conversion from
-    // float to int in the core expression language, try some_list[1.0].
-    mp_int_t val;
-    if (!mp_obj_get_int_maybe(arg, &val)) {
+// Try to convert an object to an integer.
+//
+// This function essentially performs implicit type conversion to int
+// Note that this does NOT provide implicit type conversion from
+// float to int in the core expression language, try some_list[1.0].
+//
+// Returns MP_OBJ_NULL if arg is not of integral type
+// and cannot be converted to an int.
+//
+// Otherwise the return is guaranteed to be an
+// int, though it might be a small int or a big int.
+static mp_const_obj_t mp_obj_try_convert_to_int(mp_const_obj_t arg) {
+    if (arg == mp_const_false) {
+        return MP_OBJ_NEW_SMALL_INT(0);
+    } else if (arg == mp_const_true) {
+        return MP_OBJ_NEW_SMALL_INT(1);
+    } else if (mp_obj_is_int(arg)) {
+        return arg;
+    } else {
+        return mp_unary_op(MP_UNARY_OP_INT_MAYBE, (mp_obj_t)arg);
+    }
+}
+
+// Try to convert an object to an integer.
+//
+// This function essentially performs implicit type conversion to int
+// Note that this does NOT provide implicit type conversion from
+// float to int in the core expression language, try some_list[1.0].
+//
+// Raises TypeError if arg is not of integral type and cannot be converted
+// to an int.
+//
+// The return is guaranteed to be an int, though it might be a small int
+// or a big int.
+static mp_const_obj_t mp_obj_convert_to_int(mp_const_obj_t arg) {
+    mp_const_obj_t val = mp_obj_try_convert_to_int(arg);
+    if (val == MP_OBJ_NULL) {
         mp_raise_TypeError_int_conversion(arg);
     }
     return val;
-}
-
-mp_int_t mp_obj_get_int_truncated(mp_const_obj_t arg) {
-    if (mp_obj_is_int(arg)) {
-        return mp_obj_int_get_truncated(arg);
-    } else {
-        return mp_obj_get_int(arg);
-    }
 }
 
 // returns false if arg is not of integral type
 // returns true and sets *value if it is of integral type
 // can throw OverflowError if arg is of integral type, but doesn't fit in a mp_int_t
 bool mp_obj_get_int_maybe(mp_const_obj_t arg, mp_int_t *value) {
-    if (arg == mp_const_false) {
-        *value = 0;
-    } else if (arg == mp_const_true) {
-        *value = 1;
-    } else if (mp_obj_is_small_int(arg)) {
-        *value = MP_OBJ_SMALL_INT_VALUE(arg);
-    } else if (mp_obj_is_exact_type(arg, &mp_type_int)) {
-        *value = mp_obj_int_get_checked(arg);
-    } else {
-        arg = mp_unary_op(MP_UNARY_OP_INT_MAYBE, (mp_obj_t)arg);
-        if (arg != MP_OBJ_NULL) {
-            *value = mp_obj_int_get_checked(arg);
-        } else {
-            return false;
-        }
+    arg = mp_obj_try_convert_to_int(arg);
+    if (arg == MP_OBJ_NULL) {
+        return false;
     }
+    *value = mp_obj_int_get_checked(arg);
     return true;
 }
+
+mp_int_t mp_obj_get_int(mp_const_obj_t arg) {
+    arg = mp_obj_convert_to_int(arg);
+    return mp_obj_int_get_checked(arg);
+}
+
+mp_int_t mp_obj_get_int_truncated(mp_const_obj_t arg) {
+    arg = mp_obj_convert_to_int(arg);
+    return mp_obj_int_get_truncated(arg);
+}
+
+mp_uint_t mp_obj_get_uint(mp_const_obj_t arg) {
+    arg = mp_obj_convert_to_int(arg);
+    return mp_obj_int_get_uint_checked(arg);
+}
+
+long long mp_obj_get_int_ll(mp_const_obj_t arg) {
+    arg = mp_obj_convert_to_int(arg);
+    return mp_obj_int_get_ll_checked(arg);
+}
+
+unsigned long long mp_obj_get_int_ull(mp_const_obj_t arg) {
+    arg = mp_obj_convert_to_int(arg);
+    return mp_obj_int_get_ull_checked(arg);
+}
+
 
 #if MICROPY_PY_BUILTINS_FLOAT
 bool mp_obj_get_float_maybe(mp_obj_t arg, mp_float_t *value) {

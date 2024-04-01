@@ -397,6 +397,23 @@ mp_int_t mp_obj_int_get_checked(mp_const_obj_t self_in) {
     return MP_OBJ_SMALL_INT_VALUE(self_in);
 }
 
+mp_uint_t mp_obj_int_get_uint_checked(mp_const_obj_t self_in) {
+    mp_int_t val = MP_OBJ_SMALL_INT_VALUE(self_in);
+    if (val >= 0) {
+        return val;
+    }
+
+    mp_raise_msg(&mp_type_OverflowError, MP_ERROR_TEXT("overflow converting long int to machine word"));
+}
+
+long long mp_obj_int_get_ll_checked(mp_const_obj_t self_in) {
+    return MP_OBJ_SMALL_INT_VALUE(self_in);
+}
+
+unsigned long long mp_obj_int_get_ull_checked(mp_const_obj_t self_in) {
+    return mp_obj_int_get_uint_checked(self_in);
+}
+
 #endif // MICROPY_LONGINT_IMPL == MICROPY_LONGINT_IMPL_NONE
 
 // This dispatcher function is expected to be independent of the implementation of long int
