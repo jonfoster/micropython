@@ -300,6 +300,22 @@ char *mp_obj_int_formatted(char **buf, size_t *buf_size, size_t *fmt_size, mp_co
     return b;
 }
 
+mp_obj_t mp_obj_new_int(mp_int_t value) {
+    if (MP_SMALL_INT_FITS(value)) {
+        return MP_OBJ_NEW_SMALL_INT(value);
+    }
+    return mp_obj_new_big_int_from_ll(value);
+}
+
+mp_obj_t mp_obj_new_int_from_uint(mp_uint_t value) {
+    // SMALL_INT accepts only signed numbers, so make sure the input
+    // value fits completely in the small-int positive range.
+    if ((value & ~MP_SMALL_INT_POSITIVE_MASK) == 0) {
+        return MP_OBJ_NEW_SMALL_INT(value);
+    }
+    return mp_obj_new_big_int_from_ll(value);
+}
+
 mp_obj_t mp_obj_new_int_from_ll(long long val) {
     if ((long long)MP_SMALL_INT_MIN <= val && val <= (long long)MP_SMALL_INT_MAX) {
         return MP_OBJ_NEW_SMALL_INT((mp_int_t)val);
@@ -353,24 +369,6 @@ mp_obj_t mp_obj_new_big_int_from_ll(long long val) {
 
 // This is called when an integer larger than a SMALL_INT is needed (although val might still fit in a SMALL_INT)
 mp_obj_t mp_obj_new_big_int_from_ull(unsigned long long val) {
-    mp_raise_msg(&mp_type_OverflowError, MP_ERROR_TEXT("small int overflow"));
-    return mp_const_none;
-}
-
-mp_obj_t mp_obj_new_int_from_uint(mp_uint_t value) {
-    // SMALL_INT accepts only signed numbers, so make sure the input
-    // value fits completely in the small-int positive range.
-    if ((value & ~MP_SMALL_INT_POSITIVE_MASK) == 0) {
-        return MP_OBJ_NEW_SMALL_INT(value);
-    }
-    mp_raise_msg(&mp_type_OverflowError, MP_ERROR_TEXT("small int overflow"));
-    return mp_const_none;
-}
-
-mp_obj_t mp_obj_new_int(mp_int_t value) {
-    if (MP_SMALL_INT_FITS(value)) {
-        return MP_OBJ_NEW_SMALL_INT(value);
-    }
     mp_raise_msg(&mp_type_OverflowError, MP_ERROR_TEXT("small int overflow"));
     return mp_const_none;
 }

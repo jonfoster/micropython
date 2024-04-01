@@ -373,13 +373,6 @@ mp_obj_t mp_obj_int_pow3(mp_obj_t base, mp_obj_t exponent,  mp_obj_t modulus) {
 }
 #endif
 
-mp_obj_t mp_obj_new_int(mp_int_t value) {
-    if (MP_SMALL_INT_FITS(value)) {
-        return MP_OBJ_NEW_SMALL_INT(value);
-    }
-    return mp_obj_new_int_from_ll(value);
-}
-
 mp_obj_t mp_obj_new_big_int_from_ll(long long val) {
     mp_obj_int_t *o = mp_obj_int_new_mpz();
     mpz_set_from_ll(&o->mpz, val, true);
@@ -390,15 +383,6 @@ mp_obj_t mp_obj_new_big_int_from_ull(unsigned long long val) {
     mp_obj_int_t *o = mp_obj_int_new_mpz();
     mpz_set_from_ll(&o->mpz, val, false);
     return MP_OBJ_FROM_PTR(o);
-}
-
-mp_obj_t mp_obj_new_int_from_uint(mp_uint_t value) {
-    // SMALL_INT accepts only signed numbers, so make sure the input
-    // value fits completely in the small-int positive range.
-    if ((value & ~MP_SMALL_INT_POSITIVE_MASK) == 0) {
-        return MP_OBJ_NEW_SMALL_INT(value);
-    }
-    return mp_obj_new_int_from_ull(value);
 }
 
 mp_obj_t mp_obj_new_big_int_from_str_len(const char **str, size_t len, bool neg, unsigned int base) {

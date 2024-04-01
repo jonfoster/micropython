@@ -241,22 +241,6 @@ zero_division:
     mp_raise_msg(&mp_type_ZeroDivisionError, MP_ERROR_TEXT("divide by zero"));
 }
 
-mp_obj_t mp_obj_new_int(mp_int_t value) {
-    if (MP_SMALL_INT_FITS(value)) {
-        return MP_OBJ_NEW_SMALL_INT(value);
-    }
-    return mp_obj_new_int_from_ll(value);
-}
-
-mp_obj_t mp_obj_new_int_from_uint(mp_uint_t value) {
-    // SMALL_INT accepts only signed numbers, so make sure the input
-    // value fits completely in the small-int positive range.
-    if ((value & ~MP_SMALL_INT_POSITIVE_MASK) == 0) {
-        return MP_OBJ_NEW_SMALL_INT(value);
-    }
-    return mp_obj_new_int_from_ll(value);
-}
-
 mp_obj_t mp_obj_new_big_int_from_ll(long long val) {
     mp_obj_int_t *o = mp_obj_malloc(mp_obj_int_t, &mp_type_int);
     o->val = val;
