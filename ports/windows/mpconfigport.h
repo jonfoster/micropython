@@ -134,6 +134,8 @@
 
 #define MICROPY_PY_SOCKET 1
 
+#define MICROPY_PY_OS_UNAME         (1)
+
 #define MICROPY_PY_OS               (1)
 #define MICROPY_PY_OS_INCLUDEFILE   "ports/unix/modos.c"
 #define MICROPY_PY_OS_ERRNO         (1)
@@ -187,6 +189,15 @@ extern const struct _mp_print_t mp_stderr_print;
 #define MICROPY_PORT_DEINIT_FUNC    deinit()
 
 #include <stdint.h>
+
+#define MICROPY_HW_BOARD_NAME "WindowsPC"
+#if UINTPTR_MAX == UINT32_MAX
+#define MICROPY_HW_MCU_NAME "x86"
+#elif UINTPTR_MAX == UINT64_MAX
+#define MICROPY_HW_MCU_NAME "x86-64"
+#else
+#error "UINTPTR_MAX has weird definition?"
+#endif
 
 // type definitions for the specific machine
 
