@@ -92,22 +92,9 @@
 
 // type definitions for the specific machine
 
-#ifdef __LP64__
-typedef long mp_int_t; // must be pointer size
-typedef unsigned long mp_uint_t; // must be pointer size
-#elif defined(__MINGW32__) && defined(_WIN64)
 #include <stdint.h>
-typedef __int64 mp_int_t;
-typedef unsigned __int64 mp_uint_t;
-#elif defined(_MSC_VER) && defined(_WIN64)
-typedef __int64 mp_int_t;
-typedef unsigned __int64 mp_uint_t;
-#else
-// These are definitions for machines where sizeof(int) == sizeof(void*),
-// regardless for actual size.
-typedef int mp_int_t; // must be pointer size
-typedef unsigned int mp_uint_t; // must be pointer size
-#endif
+typedef intptr_t mp_int_t;
+typedef uintptr_t mp_uint_t;
 
 // Cannot include <sys/types.h>, as it may lead to symbol name clashes
 #if _FILE_OFFSET_BITS == 64 && !defined(__LP64__)
@@ -127,8 +114,6 @@ typedef long mp_off_t;
 #include <alloca.h>
 #endif
 
-#include <stdint.h>
-
 // MSVC specifics - see windows/mpconfigport.h for explanation
 #ifdef _MSC_VER
 
@@ -139,11 +124,7 @@ typedef long mp_off_t;
 #define MP_LIKELY(x)                (x)
 #define MP_UNLIKELY(x)              (x)
 #define MICROPY_PORT_CONSTANTS      { MP_ROM_QSTR(MP_QSTR_dummy), MP_ROM_PTR(NULL) }
-#ifdef _WIN64
-#define MP_SSIZE_MAX                _I64_MAX
-#else
-#define MP_SSIZE_MAX                _I32_MAX
-#endif
+#define MP_SSIZE_MAX                INTPTR_MAX
 #define MICROPY_MAKE_POINTER_CALLABLE(p) ((void *)(p)) // Avoid compiler warning about different const qualifiers
 #define restrict
 #define inline                      __inline
@@ -153,13 +134,8 @@ typedef long mp_off_t;
 #define PATH_MAX                    MICROPY_ALLOC_PATH_MAX
 #define S_ISREG(m)                  (((m) & S_IFMT) == S_IFREG)
 #define S_ISDIR(m)                  (((m) & S_IFMT) == S_IFDIR)
-#ifdef _WIN64
-#define SSIZE_MAX                   _I64_MAX
-typedef __int64 ssize_t;
-#else
-#define SSIZE_MAX                   _I32_MAX
-typedef int ssize_t;
-#endif
+#define SSIZE_MAX                   INTPTR_MAX
+typedef intptr_t ssize_t;
 typedef mp_off_t off_t;
 
 #endif

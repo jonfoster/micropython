@@ -186,25 +186,14 @@ extern const struct _mp_print_t mp_stderr_print;
 #define MICROPY_PORT_INIT_FUNC      init()
 #define MICROPY_PORT_DEINIT_FUNC    deinit()
 
+#include <stdint.h>
+
 // type definitions for the specific machine
 
-#if defined(__MINGW32__) && defined(__LP64__)
-typedef long mp_int_t; // must be pointer size
-typedef unsigned long mp_uint_t; // must be pointer size
-#elif defined(__MINGW32__) && defined(_WIN64)
-#include <stdint.h>
-typedef __int64 mp_int_t;
-typedef unsigned __int64 mp_uint_t;
-#define MP_SSIZE_MAX __INT64_MAX__
-#elif defined(_MSC_VER) && defined(_WIN64)
-typedef __int64 mp_int_t;
-typedef unsigned __int64 mp_uint_t;
-#else
-// These are definitions for machines where sizeof(int) == sizeof(void*),
-// regardless for actual size.
-typedef int mp_int_t; // must be pointer size
-typedef unsigned int mp_uint_t; // must be pointer size
-#endif
+typedef intptr_t mp_int_t; // must be intptr_t, or equivalent on platforms that don't have that
+typedef uintptr_t mp_uint_t; // must be uintptr_t, or equivalent on platforms that don't have that
+
+#define MP_SSIZE_MAX INTPTR_MAX // must be INTPTR_MAX, or equivalent on platforms that don't have that
 
 typedef long suseconds_t;
 
@@ -252,11 +241,7 @@ typedef long mp_off_t;
 #define MP_LIKELY(x)                (x)
 #define MP_UNLIKELY(x)              (x)
 #define MICROPY_PORT_CONSTANTS      { MP_ROM_QSTR(MP_QSTR_dummy), MP_ROM_PTR(NULL) } // can't have zero-sized array
-#ifdef _WIN64
-#define MP_SSIZE_MAX                _I64_MAX
-#else
-#define MP_SSIZE_MAX                _I32_MAX
-#endif
+#define MP_SSIZE_MAX                INTPTR_MAX
 
 // VC++ 12.0 fixes
 #if (_MSC_VER <= 1800)
@@ -279,13 +264,8 @@ typedef long mp_off_t;
 #define PATH_MAX                    MICROPY_ALLOC_PATH_MAX
 #define S_ISREG(m)                  (((m) & S_IFMT) == S_IFREG)
 #define S_ISDIR(m)                  (((m) & S_IFMT) == S_IFDIR)
-#ifdef _WIN64
-#define SSIZE_MAX                   _I64_MAX
-typedef __int64 ssize_t;
-#else
-#define SSIZE_MAX                   _I32_MAX
-typedef int ssize_t;
-#endif
+#define SSIZE_MAX                   INTPTR_MAX
+typedef intptr_t ssize_t;
 typedef mp_off_t off_t;
 
 

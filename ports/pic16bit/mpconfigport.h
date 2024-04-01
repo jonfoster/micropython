@@ -77,10 +77,15 @@
 
 #define MICROPY_MAKE_POINTER_CALLABLE(p) ((void *)((mp_uint_t)(p)))
 
+// XC16 toolchain doesn't seem to define these
+typedef int intptr_t;
+typedef unsigned int uintptr_t;
+
+
 #define UINT_FMT "%u"
 #define INT_FMT "%d"
-typedef int mp_int_t; // must be pointer size
-typedef unsigned int mp_uint_t; // must be pointer size
+typedef intptr_t mp_int_t; // must be pointer size
+typedef uintptr_t mp_uint_t; // must be pointer size
 
 typedef int mp_off_t;
 
@@ -94,6 +99,3 @@ typedef int mp_off_t;
 #define MICROPY_HW_BOARD_NAME "dsPICSK"
 #define MICROPY_HW_MCU_NAME "dsPIC33"
 
-// XC16 toolchain doesn't seem to define these
-typedef int intptr_t;
-typedef unsigned int uintptr_t;

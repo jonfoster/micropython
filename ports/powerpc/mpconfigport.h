@@ -93,11 +93,16 @@
 
 #define MICROPY_MAKE_POINTER_CALLABLE(p) ((void *)((mp_uint_t)(p) | 1))
 
+// powerpc64 gcc doesn't seem to define these
+// These are pointers, so make them 64 bit types
+typedef long intptr_t;
+typedef unsigned long uintptr_t;
+
 // This port is 64-bit
 #define UINT_FMT "%lu"
 #define INT_FMT "%ld"
-typedef signed long mp_int_t; // must be pointer size
-typedef unsigned long mp_uint_t; // must be pointer size
+typedef intptr_t mp_int_t; // must be pointer size
+typedef uintptr_t mp_uint_t; // must be pointer size
 
 typedef long mp_off_t;
 
@@ -109,8 +114,3 @@ typedef long mp_off_t;
 #define MICROPY_HW_MCU_NAME "POWERPC"
 
 #define MP_STATE_PORT MP_STATE_VM
-
-// powerpc64 gcc doesn't seem to define these
-// These are pointers, so make them 64 bit types
-typedef long intptr_t;
-typedef unsigned long uintptr_t;

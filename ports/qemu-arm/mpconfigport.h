@@ -42,8 +42,8 @@
 #define UINT_FMT "%lu"
 #define INT_FMT "%ld"
 
-typedef int32_t mp_int_t; // must be pointer size
-typedef uint32_t mp_uint_t; // must be pointer size
+typedef intptr_t mp_int_t; // must be pointer size
+typedef uintptr_t mp_uint_t; // must be pointer size
 typedef long mp_off_t;
 
 // We need to provide a declaration/definition of alloca()
