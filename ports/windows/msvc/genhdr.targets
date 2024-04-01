@@ -177,7 +177,8 @@ using(var outFile = System.IO.File.CreateText(OutputFile)) {
   </Target>
 
   <Target Name="RemoveGeneratedFiles" AfterTargets="Clean">
-    <RemoveDir Directories="$(DestDir)"/>
+    <RemoveDir Directories="$(DestDir);$(PyBuildDir)frozen_mpy/"/>
+    <Delete Files="$(PyBuildDir)frozen_content.c"/>
   </Target>
 
   <!--Copies SourceFile to DestFile only if SourceFile's content differs from DestFile's.
